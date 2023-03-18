@@ -1,0 +1,15 @@
+{
+  ".tar": "Archives",
+  ".midi": "Audio",
+  ".mp3": "Audio",
+  ".ogg": "Audio",
+  ".wav": "Audio",
+  ".7z": "Compressed",
+  ".rar": "Compressed",
+  ".gz": "Compressed",
+  ".zip": "Compressed",
+  ".iso": "Disc_images",
+  ".png": "Images",
+  ".jpg": "Images",
+  ".txt": "Text"
+}

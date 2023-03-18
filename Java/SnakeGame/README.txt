@@ -1,0 +1,1 @@
+Simple snake game created as first Java project to get familiar with language basics.
