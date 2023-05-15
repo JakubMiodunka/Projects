@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<table>
+    <name>products</name>
+    <columns>
+        <id>id</id>
+        <name>name</name>
+        <categoryId>category_id</categoryId>
+        <expirationDate>expiration_date</expirationDate>
+    </columns>
+</table>
