@@ -117,20 +117,23 @@ public class ProductRepository {
     }
 
     /**
-     * Imports all products currently present in the database.
+     * Imports specified number of products currently present in the database starting from given index.
      *
-     * @return                     List of all products currently present in database.
+     * @param startIndex           Index, from which record importing should be started.
+     * @param numberOfProducts     Number of records to import starting from index given previously.
+     * @return                     List of products sized according to given parameters.
      * @throws RepositoryException When execution of generated query fail or there was an issue during
      *                             conversion from raw query result to the list of products models.
      */
-    public List<Product> getAllProducts() {
+    public List<Product> getProducts(long startIndex, long numberOfProducts) {
         // Logging
-        this.logger.info("Importing all products from database...");
+        this.logger.info("Importing {} products from database starting from index {}...", numberOfProducts, startIndex);
 
         // Query generation
         String productsTableName = this.productsTable.getTableName();
         String productsIdColumnName = this.productsTable.getIdColumnName();
         String productsNameColumnName = this.productsTable.getNameColumnName();
+        String productCategoryIdColumnName = this.productsTable.getCategoryIdColumnName();
         String productExpirationDateColumnName = this.productsTable.getExpirationDateColumnName();
 
         String categoriesTableName = this.categoriesTable.getTableName();
@@ -140,11 +143,12 @@ public class ProductRepository {
         String query = "SELECT " +
                 productsTableName + "." + productsIdColumnName + " AS 'id', " +
                 productsTableName + "." + productsNameColumnName + " AS 'name', " +
-                categoriesTableName + "." + categoriesNameColumnName + " AS 'category'," +
-                productsTableName + "." + productExpirationDateColumnName + " AS 'expiration_date'" +
+                categoriesTableName + "." + categoriesNameColumnName + " AS 'category', " +
+                productsTableName + "." + productExpirationDateColumnName + " AS 'expiration_date' " +
                 "FROM " + productsTableName + " INNER JOIN " + categoriesTableName + " ON " +
-                productsTableName + "." + productsIdColumnName + " = " +
-                categoriesTableName + "." + categoriesIdColumnName;
+                productsTableName + "." + productCategoryIdColumnName + " = " +
+                categoriesTableName + "." + categoriesIdColumnName +
+                " LIMIT " + startIndex + ", " + numberOfProducts;
 
         // Importing the data and converting it to the right format
         List<Product> importedProducts;
@@ -158,7 +162,7 @@ public class ProductRepository {
 
         } catch (DatabaseConnectionException | DatabaseQueryException | QueryResultProcessingException exception) {
             // Logging
-            String errorMessage = "Failed to import all products from database.";
+            String errorMessage = "Failed to import products from database.";
             this.logger.error(errorMessage);
 
             // Exception wrapping
@@ -166,22 +170,27 @@ public class ProductRepository {
         }
 
         // Logging
-        this.logger.info("All products imported successfully.");
+        this.logger.info("Products imported successfully.");
 
         // Returning processed query result
         return importedProducts;
     }
 
     /**
-     * Imports products, that would already be expired on the given date.
+     * Imports specified number of products, that would already be expired on the given date starting from given index.
      *
-     * @return                     List of all products, that would already be expired on the given date.
+     * @param date                 Date used as reference.
+     * @param startIndex           Index, from which record importing should be started.
+     * @param numberOfProducts     Number of records to import starting from index given previously.
+     * @return                     List of products sized accordingly to given startIndex and numberOfProducts,
+     *                             that would already be expired on the given date.
      * @throws RepositoryException When execution of generated query fail or there was an issue during
      *                             conversion from raw query result to the list of products models.
      */
-    public List<Product> getProductsExpiredOn(LocalDate date) {
+    public List<Product> getExpiredProducts(LocalDate date, long startIndex, long numberOfProducts) {
         // Logging
-        this.logger.info("Importing products, that would be expired on {}...", date);
+        this.logger.info("Importing {} products, that would be expired on {} starting from index {}...",
+                numberOfProducts, date, startIndex);
 
         // Query generation
         String productsTableName = this.productsTable.getTableName();
@@ -201,7 +210,8 @@ public class ProductRepository {
                 "FROM " + productsTableName + " INNER JOIN " + categoriesTableName + " ON " +
                 productsTableName + "." + productsIdColumnName + " = " +
                 categoriesTableName + "." + categoriesIdColumnName +
-                " WHERE expiration_date <= " + "'" + date + "'";
+                " WHERE expiration_date <= " + "'" + date + "'" +
+                " LIMIT " + startIndex + ", " + numberOfProducts;
 
         // Importing the data and converting it to the right format
         List<Product> importedProducts;
