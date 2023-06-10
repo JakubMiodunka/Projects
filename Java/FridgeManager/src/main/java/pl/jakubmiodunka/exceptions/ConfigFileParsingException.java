@@ -1,4 +1,4 @@
-package pl.jakubmiodunka.database.models.exceptions;
+package pl.jakubmiodunka.exceptions;
 
 /**
  * Exception thrown when extraction of data from config file fail.

@@ -1,6 +1,6 @@
 package pl.jakubmiodunka.database.models;
 
-import pl.jakubmiodunka.database.models.exceptions.ConfigFileParsingException;
+import pl.jakubmiodunka.exceptions.ConfigFileParsingException;
 import pl.jakubmiodunka.utilities.xml.exceptions.XmlParsingException;
 
 import java.nio.file.Path;

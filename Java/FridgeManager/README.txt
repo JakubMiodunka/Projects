@@ -6,7 +6,7 @@ There will be possible to divide product to (user defined) categories to make th
 
 App development is divided into 3 steps:
 	1. Development of core functionalities related to interactions with database (done)
-	2. Preparation of  simple GUI (ongoing - not available in this repository)
+	2. Preparation of  simple GUI (ongoing, partially done)
 	3. Launching HTTP server that can be used as aplication web interface (to do)
 
 The aim of the pocess is to gain some knowledge realted to:

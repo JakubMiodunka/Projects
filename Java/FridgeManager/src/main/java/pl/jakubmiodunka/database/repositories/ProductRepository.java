@@ -313,8 +313,8 @@ public class ProductRepository {
      * There is no possibility to add a product that belongs to category, that does not exist.
      *
      * @param  productName                 Name of the product.
-     * @param categoryId                   ID of category, to which product belong to.
-     * @param expirationDate               Date of product expiration.
+     * @param  categoryId                  ID of category, to which product belong to.
+     * @param  expirationDate              Date of product expiration.
      * @throws ForbiddenOperationException When category, to which provided category belong does not exist in database.
      * @throws RepositoryException         When execution of generated query fail.
      */

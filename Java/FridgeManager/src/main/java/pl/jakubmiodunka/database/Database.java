@@ -2,7 +2,7 @@ package pl.jakubmiodunka.database;
 
 import pl.jakubmiodunka.database.client.Client;
 import pl.jakubmiodunka.database.models.DatabaseCredentials;
-import pl.jakubmiodunka.database.models.exceptions.ConfigFileParsingException;
+import pl.jakubmiodunka.exceptions.ConfigFileParsingException;
 import pl.jakubmiodunka.database.models.tables.CategoriesTable;
 import pl.jakubmiodunka.database.models.tables.ProductsTable;
 import pl.jakubmiodunka.database.repositories.CategoriesRepository;

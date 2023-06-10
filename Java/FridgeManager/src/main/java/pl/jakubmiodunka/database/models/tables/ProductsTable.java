@@ -1,6 +1,6 @@
 package pl.jakubmiodunka.database.models.tables;
 
-import pl.jakubmiodunka.database.models.exceptions.ConfigFileParsingException;
+import pl.jakubmiodunka.exceptions.ConfigFileParsingException;
 import pl.jakubmiodunka.utilities.xml.XmlUtilities;
 import pl.jakubmiodunka.utilities.xml.exceptions.XmlParsingException;
 

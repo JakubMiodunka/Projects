@@ -91,18 +91,15 @@ public class CategoriesRepository {
     }
 
     /**
-     * Imports specified number of product categories currently present in the database starting from given index.
+     * Imports all product categories currently present in the database.
      *
-     * @param startIndex           Index, from which record importing should be started.
-     * @param numberOfProducts     Number of records to import starting from index given previously.
      * @return                     List of products sized according to given parameters.
      * @throws RepositoryException When execution of generated query fail or there was an issue during
      *                             conversion from raw query result to the list of categories models.
      */
-    public List<Category> getCategories(long startIndex, long numberOfProducts) {
+    public List<Category> getAllCategories() {
         // Logging
-        this.logger.info("Importing {} product categories from database starting from index {}...",
-                numberOfProducts, startIndex);
+        this.logger.info("Importing all product categories from database...");
 
         // Query generation
         String tableName = this.tableStructure.getTableName();
@@ -112,8 +109,7 @@ public class CategoriesRepository {
         String query = "SELECT " +
                 idColumnName + " AS 'id', " +
                 nameColumnName + " AS 'name' " +
-                "FROM " + tableName +
-                " LIMIT " + startIndex + ", " + numberOfProducts;;
+                "FROM " + tableName;
 
         // Importing the data and converting it to the right format
         List<Category> importedCategories;

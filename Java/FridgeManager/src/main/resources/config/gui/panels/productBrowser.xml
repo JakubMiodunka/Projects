@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<productExplorer>
+    <layout>
+        <numberOfRows>20</numberOfRows>
+    </layout>
+    <titles>
+        <columns>
+            <idColumnTitle>ID</idColumnTitle>
+            <nameColumnTitle>NAME</nameColumnTitle>
+            <categoryColumnTitle>CATEGORY</categoryColumnTitle>
+            <expirationDateColumnTitle>EXPIRATION DATE</expirationDateColumnTitle>
+            <deleteButtonsColumnTitle>DELETE PRODUCT</deleteButtonsColumnTitle>
+        </columns>
+        <buttons>
+            <nextPageButtonTitle>NEXT PAGE</nextPageButtonTitle>
+            <previousPageButtonTitle>PREVIOUS PAGE</previousPageButtonTitle>
+            <deleteButtonTitle>DELETE</deleteButtonTitle>
+        </buttons>
+    </titles>
+</productExplorer>
