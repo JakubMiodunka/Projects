@@ -202,7 +202,7 @@ class YouTubeVideo:
             self.save_audio_as(tmp_audio_file)
 
             # Preparing a ffmpeg command, that will merge downloaded audio and video
-            command = f"ffmpeg -i {tmp_video_file} -i '{tmp_audio_file}' {target}"
+            command = f"ffmpeg -i {tmp_video_file} -i {tmp_audio_file} {target}"
 
             # Executing prepared command
             subprocess.run(shlex.split(command), check=True)
