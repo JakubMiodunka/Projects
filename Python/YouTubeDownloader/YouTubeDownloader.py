@@ -11,7 +11,8 @@ YouTubeDownloader is a CLI based script, that is capable to download high qualit
 To work property it require installed ffmpeg and a chunk of RAM memory.
 
 Memory usage is highly dependent on video quality - here are some references:
-400 MB of RAM when processing FULL HD 30 FPS video,
+ 400 MB of RAM when processing FULL HD 30 FPS video,
+ 1.4 GB of RAM when processing 4K 60 FPS video,
 
 Currently supported output file formats are *.mp3 (encoded using MP3 codec, stores only audio content),
 *.opus (encoded using Opus codec, stores only audio content) and *.webm (stores both video and audio
@@ -28,7 +29,7 @@ class YouTubeVideo:
     To work properly it requires pytube module (developed on version 15.0.0)
     along with ffmpeg (developed on version 4.3.6-0+deb11u1). Should be launched preferably in Linux-based systems.
 
-    When dealing with high-resolution videos (i.e. 4K 60 FPS) it is recommended to have available at least 2.65 GB
+    When dealing with high-resolution videos (i.e. 4K 60 FPS) it is recommended to have available at least 1.4 GB
     of free RAM memory - it will be needed to process them using ffmpeg.
     Otherwise, ffmpeg runtime will end up with 'out of memory' error.
 
