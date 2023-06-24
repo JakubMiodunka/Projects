@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<productBrowser>
+<categoryBrowser>
     <layout>
         <numberOfRows>20</numberOfRows>
     </layout>
@@ -7,8 +7,6 @@
         <columns>
             <idColumnTitle>ID</idColumnTitle>
             <nameColumnTitle>NAME</nameColumnTitle>
-            <categoryColumnTitle>CATEGORY</categoryColumnTitle>
-            <expirationDateColumnTitle>EXPIRATION DATE</expirationDateColumnTitle>
             <deleteButtonsColumnTitle>DELETE PRODUCT</deleteButtonsColumnTitle>
         </columns>
         <buttons>
@@ -17,4 +15,4 @@
             <deleteButtonsTitle>DELETE</deleteButtonsTitle>
         </buttons>
     </titles>
-</productBrowser>
+</categoryBrowser>

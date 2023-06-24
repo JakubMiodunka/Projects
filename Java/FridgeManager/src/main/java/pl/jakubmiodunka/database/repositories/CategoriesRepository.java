@@ -305,7 +305,7 @@ public class CategoriesRepository {
         try {
             if (this.productRepository.productQuantityInCategory(categoryId) > 0) {
                 // Logging
-                String errorMessage = "Removal of specified category not allowed" +
+                String errorMessage = "Removal of specified category not allowed " +
                         "- there are still some products related to it.";
                 this.logger.error(errorMessage);
 

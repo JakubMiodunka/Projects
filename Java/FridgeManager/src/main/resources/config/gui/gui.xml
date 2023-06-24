@@ -5,4 +5,13 @@
         <width>1000</width>
         <height>500</height>
     </size>
+    <menuBar>
+        <modeMenu>
+            <title>Mode</title>
+            <switches>
+                <productExplorerSwitchTitle>ProductExplorer</productExplorerSwitchTitle>
+                <categoryExplorerSwitchTitle>CategoryExplorer</categoryExplorerSwitchTitle>
+            </switches>
+        </modeMenu>
+    </menuBar>
 </gui>

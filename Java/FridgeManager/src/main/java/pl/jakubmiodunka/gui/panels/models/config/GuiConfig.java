@@ -20,6 +20,11 @@ public class GuiConfig {
     private final int width;
     private final int height;
 
+    // Titles used in menu bar
+    private final String modeMenuTitle;
+    private final String productExplorerSwitchTitle;
+    private final String categoryExplorerSwitchTitle;
+
     /**
      * @param  configXmlPath              Path to config XML file containing GUI configuration.
      * @throws ConfigFileParsingException When extraction of data from provided config XML file fail.
@@ -31,11 +36,17 @@ public class GuiConfig {
 
             // Extracting sub-nodes
             Element sizeNode = XmlUtilities.getNode(rootElement, "size");
+            Element menuBarNode = XmlUtilities.getNode(rootElement, "menuBar");
+            Element modeMenuNode = XmlUtilities.getNode(menuBarNode, "modeMenu");
+            Element modeSwitchesNode = XmlUtilities.getNode(modeMenuNode, "switches");
 
             // Properties init
             this.title = XmlUtilities.getContentOfNode(rootElement, "title");
             this.width = Integer.parseInt(XmlUtilities.getContentOfNode(sizeNode, "width"));
             this.height = Integer.parseInt(XmlUtilities.getContentOfNode(sizeNode, "height"));
+            this.modeMenuTitle = XmlUtilities.getContentOfNode(modeMenuNode, "title");
+            this.productExplorerSwitchTitle = XmlUtilities.getContentOfNode(modeSwitchesNode, "productExplorerSwitchTitle");
+            this.categoryExplorerSwitchTitle = XmlUtilities.getContentOfNode(modeSwitchesNode, "categoryExplorerSwitchTitle");
 
         } catch (XmlParsingException | NumberFormatException exception) {
             // Exception wrapping
@@ -63,5 +74,26 @@ public class GuiConfig {
      * */
     public int getHeight() {
         return height;
+    }
+
+    /**
+     * @return Mode menu title.
+     * */
+    public String getModeMenuTitle() {
+        return modeMenuTitle;
+    }
+
+    /**
+     * @return Title of item in mode menu, responsible for switching GUI to product explorer mode.
+     * */
+    public String getProductExplorerSwitchTitle() {
+        return productExplorerSwitchTitle;
+    }
+
+    /**
+     * @return Title of item in mode menu, responsible for switching GUI to category explorer mode.
+     * */
+    public String getCategoryExplorerSwitchTitle() {
+        return categoryExplorerSwitchTitle;
     }
 }

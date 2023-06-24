@@ -1,5 +1,7 @@
 package pl.jakubmiodunka.gui;
 
+import pl.jakubmiodunka.gui.panels.CategoryBrowser;
+import pl.jakubmiodunka.gui.panels.models.config.CategoryBrowserConfig;
 import pl.jakubmiodunka.gui.panels.models.config.GuiConfig;
 import pl.jakubmiodunka.gui.panels.models.config.ProductAdderConfig;
 import pl.jakubmiodunka.gui.panels.models.config.ProductBrowserConfig;
@@ -7,8 +9,7 @@ import pl.jakubmiodunka.gui.panels.ProductAdder;
 import pl.jakubmiodunka.gui.panels.ProductBrowser;
 
 import java.awt.BorderLayout;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.*;
 import java.nio.file.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,11 +25,15 @@ public class Gui extends JFrame {
     private final JPanel productExplorerModeLeftPanel;
     private final JPanel productExplorerModeCenterPanel;
 
+    // Panels in category explorer mode
+    private final JPanel categoryExplorerModeLeftPanel;
+    private final JPanel categoryExplorerModeCenterPanel;
+
     // Internally used logger
     private final Logger logger;
 
     /**
-     * @param  config                      Configuration of the GUI, that will be used during initialisation.
+     * @param  config Configuration of the GUI, that will be used during initialisation.
      * */
     public Gui(GuiConfig config) {
         // Parent class constructor call
@@ -37,12 +42,6 @@ public class Gui extends JFrame {
         // Initialising logger
         this.logger = LoggerFactory.getLogger(Gui.class);
 
-        // Setting up frame properties
-        this.setTitle(config.getTitle());
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setLayout(new BorderLayout());
-        this.setSize(config.getWidth(), config.getHeight());
-
         // Preparing panels used in product explorer mode
         Path productBrowserConfigXml = Path.of("src/main/resources/config/gui/panels/productBrowser.xml");
         this.logger.debug("Creating product browser panel configuration model using '{}' file...", productBrowserConfigXml);
@@ -50,7 +49,7 @@ public class Gui extends JFrame {
         this.logger.debug("Product browser panel configuration model successfully created.");
 
         this.logger.info("Creating product browser panel...");
-        ProductBrowser productBrowser = new ProductBrowser(productBrowserConfig);
+        ProductBrowser productBrowser = ProductBrowser.getNewPanel(productBrowserConfig);
         this.logger.info("Product browser panel successfully created.");
         this.productExplorerModeCenterPanel = productBrowser;
 
@@ -66,9 +65,41 @@ public class Gui extends JFrame {
         this.productExplorerModeLeftPanel = productAdder;
 
         // Preparing panels used in categories explorer mode
-        // TODO: Introduce categories explorer mode of GUI
+        Path categoryBrowserConfigXml = Path.of("src/main/resources/config/gui/panels/categoryBrowser.xml");
+        this.logger.debug("Creating category browser panel configuration model using '{}' file...", categoryBrowserConfigXml);
+        CategoryBrowserConfig categoryBrowserConfig = new CategoryBrowserConfig(categoryBrowserConfigXml);
+        this.logger.debug("Category browser panel configuration model successfully created.");
 
-        // Setting the GUI to product explorer mode
+        this.logger.info("Creating category browser panel...");
+        CategoryBrowser categoryBrowser = CategoryBrowser.getNewPanel(categoryBrowserConfig);
+        this.logger.info("Category browser panel successfully created.");
+        this.categoryExplorerModeCenterPanel = categoryBrowser;
+
+        this.categoryExplorerModeLeftPanel = new JPanel();  // TODO: implement
+
+        // Setting up frame properties
+        this.setTitle(config.getTitle());
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setLayout(new BorderLayout());
+        this.setSize(config.getWidth(), config.getHeight());
+
+        // Adding menu bar
+        JMenu modeMenu = new JMenu(config.getModeMenuTitle());
+
+        JMenuItem productExplorerSwitch = new JMenuItem(config.getProductExplorerSwitchTitle());
+        productExplorerSwitch.addActionListener(event -> this.setProductExplorerMode());
+        modeMenu.add(productExplorerSwitch);
+
+        JMenuItem categoryExplorerSwitch = new JMenuItem(config.getCategoryExplorerSwitchTitle());
+        categoryExplorerSwitch.addActionListener(event -> this.setCategoryExplorerMode());
+        modeMenu.add(categoryExplorerSwitch);
+
+        JMenuBar menuBar = new JMenuBar();
+        menuBar.add(modeMenu);
+
+        this.setJMenuBar(menuBar);
+
+        // Setting the GUI to product explorer mode as default
         this.setProductExplorerMode();
 
         // Making frame visible
@@ -81,10 +112,40 @@ public class Gui extends JFrame {
     private void setProductExplorerMode() {
         this.logger.info("Switching the GUI to product explorer mode...");
 
+        // Removing components related to category explorer mode
+        this.remove(this.categoryExplorerModeCenterPanel);
+        this.remove(this.categoryExplorerModeLeftPanel);
+
+        // Adding components related to product explorer mode
         this.add(this.productExplorerModeCenterPanel, BorderLayout.CENTER);
         this.add(this.productExplorerModeLeftPanel, BorderLayout.WEST);
+
+        // Updating displayed content
+        this.validate();
+        this.repaint();
 
         this.logger.info("GUI successfully switched to product explorer mode.");
     }
 
+    /**
+     * Switches the GUI to category explorer mode.
+     * */
+    private void setCategoryExplorerMode() {
+        // Logging
+        this.logger.info("Switching the GUI to category explorer mode...");
+
+        // Removing components related to product explorer mode
+        this.remove(this.productExplorerModeCenterPanel);
+        this.remove(this.productExplorerModeLeftPanel);
+
+        // Adding components related to category explorer mode
+        this.add(this.categoryExplorerModeCenterPanel, BorderLayout.CENTER);
+        this.add(this.categoryExplorerModeLeftPanel, BorderLayout.WEST);
+
+        // Updating displayed content
+        this.validate();
+        this.repaint();
+
+        this.logger.info("GUI successfully switched to category explorer mode.");
+    }
 }

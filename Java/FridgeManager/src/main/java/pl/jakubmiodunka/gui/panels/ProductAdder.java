@@ -196,7 +196,7 @@ public class ProductAdder extends JPanel implements RefreshablePanel {
             this.logger.error(errorMessage);
 
             // Throwing an exception
-            throw new RuntimeException(errorMessage);   // Should not be possible
+            throw new RuntimeException(errorMessage, exception);   // Should not be possible
         }
 
         // Getting product expiration date from text box
