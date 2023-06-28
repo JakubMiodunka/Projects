@@ -3,7 +3,7 @@
     <titles>
         <panelTitle>ADD PRODUCT</panelTitle>
         <textFields>
-            <productNameTextFieldTitle>Name</productNameTextFieldTitle>
+            <recordNameTextFieldTitle>Name</recordNameTextFieldTitle>
             <expirationDateTextField>Expiration date (YYYY-MM-DD)</expirationDateTextField>
         </textFields>
         <comboBoxes>

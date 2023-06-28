@@ -1,10 +1,8 @@
 package pl.jakubmiodunka.gui;
 
+import pl.jakubmiodunka.gui.panels.CategoryAdder;
 import pl.jakubmiodunka.gui.panels.CategoryBrowser;
-import pl.jakubmiodunka.gui.panels.models.config.CategoryBrowserConfig;
-import pl.jakubmiodunka.gui.panels.models.config.GuiConfig;
-import pl.jakubmiodunka.gui.panels.models.config.ProductAdderConfig;
-import pl.jakubmiodunka.gui.panels.models.config.ProductBrowserConfig;
+import pl.jakubmiodunka.gui.panels.models.config.*;
 import pl.jakubmiodunka.gui.panels.ProductAdder;
 import pl.jakubmiodunka.gui.panels.ProductBrowser;
 
@@ -59,7 +57,7 @@ public class Gui extends JFrame {
         this.logger.debug("Product adder panel configuration model successfully created.");
 
         this.logger.info("Creating product adder panel...");
-        ProductAdder productAdder = new ProductAdder(productAdderConfig);
+        ProductAdder productAdder = ProductAdder.getNewPanel(productAdderConfig);
         productAdder.addDependentPanel(productBrowser);
         this.logger.info("Product adder panel successfully created.");
         this.productExplorerModeLeftPanel = productAdder;
@@ -72,10 +70,21 @@ public class Gui extends JFrame {
 
         this.logger.info("Creating category browser panel...");
         CategoryBrowser categoryBrowser = CategoryBrowser.getNewPanel(categoryBrowserConfig);
+        categoryBrowser.addDependentPanel(productAdder);
         this.logger.info("Category browser panel successfully created.");
         this.categoryExplorerModeCenterPanel = categoryBrowser;
 
-        this.categoryExplorerModeLeftPanel = new JPanel();  // TODO: implement
+        Path categoryAdderConfigXml = Path.of("src/main/resources/config/gui/panels/categoryAdder.xml");
+        this.logger.debug("Creating category adder panel configuration model using '{}' file...", categoryAdderConfigXml);
+        CategoryAdderConfig categoryAdderConfig = new CategoryAdderConfig(categoryAdderConfigXml);
+        this.logger.debug("Category adder panel configuration model successfully created.");
+
+        this.logger.info("Creating category adder panel...");
+        CategoryAdder categoryAdder = CategoryAdder.getNewPanel(categoryAdderConfig);
+        categoryAdder.addDependentPanel(categoryBrowser);
+        categoryAdder.addDependentPanel(productAdder);
+        this.logger.info("Category adder panel successfully created.");
+        this.categoryExplorerModeLeftPanel = categoryAdder;
 
         // Setting up frame properties
         this.setTitle(config.getTitle());

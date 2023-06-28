@@ -1,7 +1,5 @@
 package pl.jakubmiodunka.gui.panels;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import pl.jakubmiodunka.database.Database;
 import pl.jakubmiodunka.database.models.content.Category;
 import pl.jakubmiodunka.database.repositories.exceptions.ForbiddenOperationException;
@@ -14,8 +12,14 @@ import pl.jakubmiodunka.gui.panels.utilities.LabelColumn;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.util.ArrayList;
 import java.util.List;
-import javax.swing.*;
+import javax.swing.JOptionPane;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * Panel, where product categories currently stored in repository can be browsed.
@@ -44,6 +48,9 @@ public class CategoryBrowser extends JPanel implements RefreshablePanel {
 
     // Current page number
     protected long page;
+
+    // List of panels that will be refreshed when record will be deleted from repository
+    protected final List<RefreshablePanel> dependentPanels;
 
     // Internally used logger
     protected final Logger logger;
@@ -74,6 +81,9 @@ public class CategoryBrowser extends JPanel implements RefreshablePanel {
         // Initialising things related with paging
         this.page = 0;                              // Initially set to first page
         this.previousPageButton.setEnabled(false);  // Initially disabled as moving to page -1 makes no sense
+
+        // Initialising other properties
+        this.dependentPanels = new ArrayList<>();
     }
 
     /**
@@ -168,6 +178,15 @@ public class CategoryBrowser extends JPanel implements RefreshablePanel {
 
         this.logger.info("Product category removed successfully.");
 
+        // Refreshing panels, that are dependent on performed action
+        this.logger.debug("Refreshing the panels, that are dependent on performed action...");
+
+        for (RefreshablePanel panel: this.dependentPanels) {
+            panel.refresh();
+        }
+
+        this.logger.debug("All panels refreshed successfully.");
+
         // Refreshing content of the panel
         this.refresh();
     }
@@ -223,7 +242,7 @@ public class CategoryBrowser extends JPanel implements RefreshablePanel {
 
         List<Category> importedCategories = Database.getCategoriesRepository().getAllCategories();
 
-        this.logger.debug("Products imported successfully.");
+        this.logger.debug("Product categories imported successfully.");
 
         // Checking if there is at least one product category in repository
         if (importedCategories.isEmpty()) {
@@ -309,5 +328,15 @@ public class CategoryBrowser extends JPanel implements RefreshablePanel {
 
         // Returning created panel as ready to use
         return newPanel;
+    }
+
+    /**
+     * Adds given panel to the pool of panels, that will be refreshed after each removal of record from repository.
+     *
+     * @param panel Refreshable panel, which state is dependent on the action of removing the record from repository
+     *              by the instance of this class.
+     * */
+    public void addDependentPanel(RefreshablePanel panel) {
+        this.dependentPanels.add(panel);
     }
 }

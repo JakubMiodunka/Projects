@@ -5,7 +5,6 @@ import pl.jakubmiodunka.database.models.content.Category;
 import pl.jakubmiodunka.database.repositories.exceptions.ForbiddenOperationException;
 import pl.jakubmiodunka.database.repositories.exceptions.RepositoryException;
 import pl.jakubmiodunka.exceptions.InvalidConfigValueException;
-import pl.jakubmiodunka.gui.panels.exceptions.InvalidUserInputException;
 import pl.jakubmiodunka.gui.panels.interfaces.RefreshablePanel;
 import pl.jakubmiodunka.gui.panels.models.config.ProductAdderConfig;
 
@@ -14,25 +13,24 @@ import java.awt.GridLayout;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javax.swing.JOptionPane;
 
 /**
  * A panel that allows the user to add products to the repository.
  *
+ * Extends category adder panel as some properties are common in
+ * both cases - for more details refer to docstrings placed in CategoryAdder class.
+ *
  * @author Jakub Miodunka
  * */
-public class ProductAdder extends JPanel implements RefreshablePanel {
-    // Components used on the panel
-    private final JTextField nameTextField;
+public class ProductAdder extends CategoryAdder implements RefreshablePanel {
+    // Additional components used on the panel
     private final JComboBox<String> categoriesComboBox;
     private final JTextField expirationDateTextField;
 
@@ -42,45 +40,34 @@ public class ProductAdder extends JPanel implements RefreshablePanel {
     // List where all available in repository product categories are stored
     private List<Category> allCategories;
 
-    // List of panels that will be refreshed when new product will be added to repository
-    private final List<RefreshablePanel> dependentPanels;
-
-    // Internally used logger
-    private final Logger logger;
-
     /**
      * @param  config                      Configuration of the panel, that will be used during initialisation.
      * @throws InvalidConfigValueException When product expiration date format given in config is invalid.
      * */
-    public ProductAdder(ProductAdderConfig config) {
-        // Parent Class constructor call
-        super();
+    protected ProductAdder(ProductAdderConfig config) {
+        // Parent class constructor call
+        super(config);
 
-        // Initialising logger
-        this.logger = LoggerFactory.getLogger(ProductAdder.class);
-
-        // Preparing components
-        this.nameTextField = new JTextField();
+        // Preparing additional components
         this.expirationDateTextField = new JTextField();
         this.categoriesComboBox = new JComboBox<>();
 
-        JButton addButton = new JButton();
-        addButton.setText(config.getAddButtonTitle());
-        addButton.addActionListener(event -> this.addProduct());
-
-        // Initialising other properties
-        this.dependentPanels = new ArrayList<>();
-
+        // Initialising other additional properties
         try {
             this.expirationDateFormatter = DateTimeFormatter.ofPattern(config.getExpirationDateFormat());
         } catch (IllegalArgumentException exception) {
             // Exception wrapping
             throw new InvalidConfigValueException("Invalid format of product expiration date given.", exception);
         }
+    }
 
-        // Importing the data from repository
-        this.refresh();
-
+    /**
+     * Sets the layout of product adder panel.
+     * Meant to be used only once during instance initialisation.
+     *
+     * @param  config   Configuration of the panel, that will be used during layout setting process.
+     * */
+    private void setLayout(ProductAdderConfig config) {
         // Setting the panel layout
         this.setLayout(new BorderLayout());
 
@@ -90,8 +77,8 @@ public class ProductAdder extends JPanel implements RefreshablePanel {
         // Creating sub-panel, where components are placed
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout(new GridLayout(10, 1));   // Additional rows added to keep
-                                                                  // the proportions in panel apprentice
-        centerPanel.add(titleLabelFactory(config.getProductNameTextFieldTitle()));
+        // the proportions in panel apprentice
+        centerPanel.add(titleLabelFactory(config.getRecordTextFieldTitle()));
         centerPanel.add(this.nameTextField);
         centerPanel.add(new JLabel());    // Spacer
 
@@ -106,61 +93,12 @@ public class ProductAdder extends JPanel implements RefreshablePanel {
         this.add(centerPanel, JLabel.CENTER);
 
         // Adding the 'add' button as a footer
-        this.add(addButton, BorderLayout.SOUTH);
-    }
-
-    /**
-     * Creates new label filled with given text aligned to the center.
-     *
-     * @param title Text, that will be placed inside created label.
-     * @return      Label with given text align to the center.
-     * */
-    private static JLabel titleLabelFactory(String title) {
-        JLabel newTitleLabel = new JLabel(title);
-        newTitleLabel.setHorizontalAlignment(JLabel.CENTER);
-        return newTitleLabel;
-    }
-
-    /**
-     * Import the data and refresh displayed content.
-     *
-     * @throws RepositoryException When import of the data from repository fail.
-     * */
-    public void refresh() {
-        // Logging
-        this.logger.info("Refreshing the panel...");
-
-        // Updating the locally stored list of all available categories
-        this.logger.debug("Filling internal categories list with all categories available in repository...");
-
-        this.allCategories = Database.getCategoriesRepository().getAllCategories();
-
-        this.logger.debug("Internal categories list filled.");
-
-        // Updating the categories combo box
-        this.logger.debug("Synchronising categories combo box with internal categories list...");
-
-        this.categoriesComboBox.removeAllItems();
-        this.allCategories.forEach(category -> this.categoriesComboBox.addItem(category.getName()));
-
-        // Logging
-        this.logger.debug("Synchronisation successful.");
-        this.logger.info("Panel successfully refreshed.");
-    }
-
-    /**
-     * Adds given panel to the pool of panels, that will be refreshed after each addition of product to repository.
-     *
-     * @param panel Refreshable panel, which state is dependent on the action of adding the product to repository.
-     * */
-    public void addDependentPanel(RefreshablePanel panel) {
-        this.dependentPanels.add(panel);
+        this.add(this.addButton, BorderLayout.SOUTH);
     }
 
     /**
      * Adds a product, which properties are currently stored in panel components to repository.
      *
-     * @throws InvalidUserInputException   When data, given by the user is invalid.
      * @throws RepositoryException         When adding new product to repository fail.
      * @throws RuntimeException            When some unexpected error occur.
      * */
@@ -177,8 +115,9 @@ public class ProductAdder extends JPanel implements RefreshablePanel {
             String errorMessage = "Given product name is an empty string.";
             this.logger.error(errorMessage);
 
-            // Throwing an exception
-            throw new InvalidUserInputException(errorMessage);
+            // Showing pop-up window and exiting
+            JOptionPane.showMessageDialog(this, errorMessage, "Warning", JOptionPane.WARNING_MESSAGE);
+            return;
         }
 
         // Getting product category from combo box
@@ -211,8 +150,9 @@ public class ProductAdder extends JPanel implements RefreshablePanel {
             String errorMessage = "Given expiration date not in valid format.";
             this.logger.error(errorMessage);
 
-            // Throwing an exception
-            throw new InvalidUserInputException(errorMessage, exception);
+            // Showing pop-up window and exiting
+            JOptionPane.showMessageDialog(this, errorMessage, "Warning", JOptionPane.WARNING_MESSAGE);
+            return;
         }
 
         // Adding product to repository
@@ -238,5 +178,58 @@ public class ProductAdder extends JPanel implements RefreshablePanel {
         }
 
         this.logger.debug("All panels refreshed successfully.");
+    }
+
+    /**
+     * Assigns functionalities to 'add' button placed in the panel footer.
+     * Meant to be used only once during instance initialisation.
+     * */
+    private void setAddButtonFunction() {
+        this.addButton.addActionListener(event -> this.addProduct());
+    }
+
+    /**
+     * Import the data and refresh displayed content.
+     *
+     * @throws RepositoryException When import of the data from repository fail.
+     * */
+    public void refresh() {
+        // Logging
+        this.logger.info("Refreshing the panel...");
+
+        // Updating the locally stored list of all available categories
+        this.logger.debug("Filling internal categories list with all categories available in repository...");
+
+        this.allCategories = Database.getCategoriesRepository().getAllCategories();
+
+        this.logger.debug("Internal categories list filled.");
+
+        // Updating the categories combo box
+        this.logger.debug("Synchronising categories combo box with internal categories list...");
+
+        this.categoriesComboBox.removeAllItems();
+        this.allCategories.forEach(category -> this.categoriesComboBox.addItem(category.getName()));
+
+        // Logging
+        this.logger.debug("Synchronisation successful.");
+        this.logger.info("Panel successfully refreshed.");
+    }
+
+    /**
+     * Factory method, meant to be used externally to create new class instances.
+     *
+     * @param config               Configuration of the panel, that will be used during initialisation.
+     * */
+    public static ProductAdder getNewPanel(ProductAdderConfig config) {
+        // Creating new categories adder panel
+        ProductAdder newPanel = new ProductAdder(config);
+
+        // Further panel initialisation
+        newPanel.setLayout(config);
+        newPanel.setAddButtonFunction();
+        newPanel.refresh();
+
+        // Returning created panel as ready to use
+        return newPanel;
     }
 }

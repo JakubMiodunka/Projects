@@ -9,16 +9,14 @@ import org.w3c.dom.Element;
 
 /**
  * Model of product adder panel configuration, that can be used for initialising it.
+ * As product adder panel extends the functionalities of category adder, the class is a child of CategoryAdderConfig.
  *
  * @author Jakub Miodunka
  * */
-public class ProductAdderConfig {
-    // Component titles
-    private final String panelTitle;
-    private final String productNameTextFieldTitle;
+public class ProductAdderConfig extends CategoryAdderConfig{
+    // Additional component titles;
     private final String expirationDateTextFieldTitle;
     private final String categoriesComboBoxTitle;
-    private final String addButtonTitle;
 
     // Formatting
     private final String expirationDateFormat;
@@ -28,6 +26,11 @@ public class ProductAdderConfig {
      * @throws ConfigFileParsingException When extraction of data from provided config XML file fail.
      * */
     public ProductAdderConfig(Path configXmlPath) {
+        // Parent class constructor call
+        super(configXmlPath, "productAdder"); // It would be better to store root node name as variable,
+                                                            // but parent class constructor call should be first
+                                                            // statement in constructor body
+        // Initialisation of non-inherited properties
         try {
             // Extracting root node from given file
             Element rootElement = XmlUtilities.getRootNode(configXmlPath, "productAdder");
@@ -36,15 +39,11 @@ public class ProductAdderConfig {
             Element titlesNode = XmlUtilities.getNode(rootElement, "titles");
             Element textFieldsTitlesNode = XmlUtilities.getNode(titlesNode, "textFields");
             Element comboBoxesTitlesNode = XmlUtilities.getNode(titlesNode, "comboBoxes");
-            Element buttonsTitlesNode = XmlUtilities.getNode(titlesNode, "buttons");
             Element formattingNode = XmlUtilities.getNode(rootElement, "formatting");
 
             // Properties init
-            this.panelTitle = XmlUtilities.getContentOfNode(titlesNode, "panelTitle");
-            this.productNameTextFieldTitle = XmlUtilities.getContentOfNode(textFieldsTitlesNode, "productNameTextFieldTitle");
             this.expirationDateTextFieldTitle = XmlUtilities.getContentOfNode(textFieldsTitlesNode, "expirationDateTextField");
             this.categoriesComboBoxTitle = XmlUtilities.getContentOfNode(comboBoxesTitlesNode, "categoriesComboBoxTitle");
-            this.addButtonTitle = XmlUtilities.getContentOfNode(buttonsTitlesNode, "addButtonTitle");
             this.expirationDateFormat = XmlUtilities.getContentOfNode(formattingNode, "expirationDateFormat");
 
         } catch (XmlParsingException | NumberFormatException exception) {
@@ -52,20 +51,6 @@ public class ProductAdderConfig {
             String errorMessage = "Failed to create panel configuration model using '" + configXmlPath + "' file.";
             throw new ConfigFileParsingException(errorMessage, exception);
         }
-    }
-
-    /**
-     * @return Title of the panel.
-     * */
-    public String getPanelTitle() {
-        return panelTitle;
-    }
-
-    /**
-     * @return Title of text field, where product name is input.
-     * */
-    public String getProductNameTextFieldTitle() {
-        return productNameTextFieldTitle;
     }
 
     /**
@@ -80,13 +65,6 @@ public class ProductAdderConfig {
      * */
     public String getCategoriesComboBoxTitle() {
         return categoriesComboBoxTitle;
-    }
-
-    /**
-     * @return Title of the button, which is used to submit the action of adding the product to the repository.
-     * */
-    public String getAddButtonTitle() {
-        return addButtonTitle;
     }
 
     /**

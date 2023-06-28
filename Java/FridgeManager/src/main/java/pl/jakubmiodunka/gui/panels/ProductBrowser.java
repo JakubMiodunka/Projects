@@ -4,6 +4,7 @@ import pl.jakubmiodunka.database.Database;
 import pl.jakubmiodunka.database.models.content.Product;
 import pl.jakubmiodunka.database.repositories.exceptions.RepositoryException;
 import pl.jakubmiodunka.gui.panels.exceptions.OutOfSpaceException;
+import pl.jakubmiodunka.gui.panels.interfaces.RefreshablePanel;
 import pl.jakubmiodunka.gui.panels.models.config.ProductBrowserConfig;
 import pl.jakubmiodunka.gui.panels.utilities.LabelColumn;
 
@@ -14,8 +15,9 @@ import javax.swing.JPanel;
 
 /**
  * Panel, where product stored in repository can be browsed.
+ *
  * Extends category browser as some properties are common in
- * both cases - for more details refer to docstrings placed in CategoriesBrowser class.
+ * both cases - for more details refer to docstrings placed in CategoryBrowser class.
  *
  * @author Jakub Miodunka
  * */
@@ -77,6 +79,15 @@ public class ProductBrowser extends CategoryBrowser {
         Database.getProductRepository().removeProduct(product.getId());
 
         this.logger.info("Product removed successfully.");
+
+        // Refreshing panels, that are dependent on performed action
+        this.logger.debug("Refreshing the panels, that are dependent on performed action...");
+
+        for (RefreshablePanel panel: this.dependentPanels) {
+            panel.refresh();
+        }
+
+        this.logger.debug("All panels refreshed successfully.");
 
         // Refreshing content of the panel
         this.refresh();
